@@ -15,11 +15,6 @@ import tweepy
 import re
 import string
 import os.path
-import nltk.classify.util
-
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.classify import NaiveBayesClassifier
 ## --------------------------
 
 
@@ -60,17 +55,17 @@ class MyStreamListener(tweepy.StreamListener):
     # Calls this everytime a 'status' / tweet is found
     def on_status(self, status):
         try:
-	    	# As long as the tweet is longer than 140 chars, get the full text
+            # As long as the tweet is longer than 140 chars, get the full text
             text = status.extended_tweet["full_text"]
         except AttributeError:
-    		# Otherwise just use the normal text
+            # Otherwise just use the normal text
             text = status.text
 
-    	# Adds the 'status' we are working with to the list of tweets as text minus any unnecessary spaces          
+        # Adds the 'status' we are working with to the list of tweets as text minus any unnecessary spaces          
         tweets.append(text.rstrip())
         # When the list of tweets is greater than or equal to 'maximum_tweets'
         if len(tweets) >= maximum_tweets:
-        	# Stop listening to the stream
+            # Stop listening to the stream
             myStream.disconnect()
 
     # Catch any errors that may occur
@@ -138,67 +133,6 @@ def sort_tweets(tweets):
 ## --------------------------
 
 
-## ---- PARSE FUNCTIONS -----
-# Removes irrelevant words from a tweet and returns as dictionary
-def parse_tweets(words):
-    # Makes the whole tweet lowercase
-    words = words.lower()
-    # Splits the tweet into individual words 
-    words = word_tokenize(words)
-    # If the word is irrelevant ignore it
-    words = [word for word in words if word not in stopwords.words("english")]
-    # Creates a dictionary and adds the words as keys and sets each value to TRUE
-    word_dictionary = dict([(word, True) for word in words])
-    # Returns the dictionary created
-    return word_dictionary
-
-# Trains a classifier that will be able to determine if a tweet is positive or negative
-def train_classifier(positive_tweets, negative_tweets):
-    # Assigns a positive 'tag' to the words in the tweet
-    positive_tweets = [(parse_tweets(tweet),'positive') for tweet in positive_tweets]
-    # Does the same to negative tweets
-    negative_tweets = [(parse_tweets(tweet),'negative') for tweet in negative_tweets]
-    # Work out the number of tweets needed for 80% of the positive tweets
-    fraction_pos =  round(len(positive_tweets) * 0.8)
-    fraction_neg =  round(len(negative_tweets) * 0.8)
-        
-    train_set = negative_tweets[:fraction_pos] + positive_tweets[:fraction_pos]
-    test_set =  negative_tweets[fraction_neg:] + positive_tweets[fraction_neg:]
-    classifier = NaiveBayesClassifier.train(train_set)
-    accuracy = nltk.classify.util.accuracy(classifier, test_set)
-    return classifier, accuracy
-
-def calculate_millennialness(classifier, accuracy, user):
-    for name in user:
-        try:
-            user_tweets = api.user_timeline(screen_name = user, count = user_tweet_count, include_rts = True)
-        except tweepy.TweepError as e:
-            user = input("the handle you entered was invalid, please try again: ")
-        catchcount = 0
-
-    user_tweets = [tweet.text for tweet in user_tweets]
-    user_tweets = clean_tweets(user_tweets)
-
-    millennial_tweets = []
-
-    for tweet in user_tweets:
-        if any(x in tweet.lower() for x in millennial_words):
-            millennial_tweets.append(tweet)
-
-    millennial_tweets_proportion = len(millennial_tweets) / len(user_tweets)
-
-    if len(millennial_tweets) >= 1:
-        rating = [classifier.classify(parse_tweets(tweet)) for tweet in millennial_tweets]
-        millennial_percent = rating.count ('positive') / len(rating)
-
-        print('\nmillennial-ness: ' + str(round(millennial_percent, 3)) + ' (accuracy: ' + str(round(accuracy * 100, 1))+'%)')
-        print('millennial tweets: ' + str(len(millennial_tweets)))
-        print('millennial tweet proportion: ' + str(round(millennial_tweets_proportion, 3))+'\n')
-    else:
-        print('definently not a millennial.')
-## --------------------------
-
-
 ## ---- EXECUTE PROGRAM -----
 # Gets the path of this .py file
 current_path = os.path.abspath(os.path.dirname(__file__))
@@ -210,10 +144,4 @@ tweets = store_tweets(file_path, tweets)
 tweets = clean_tweets(tweets)
 # Splits the list of all tweets into two sets, positive and negative 
 positive_tweets, negative_tweets = sort_tweets(tweets)
-# Using the new tweets, re-train the classifier 
-classifier, accuracy = train_classifier(positive_tweets, negative_tweets)
-# Get the user's twitter handle
-twitter_handle = input("what is your twitter handle?   @")
-# Calculate score and determine millennial-ness
-calculate_millennialness(classifier, accuracy, twitter_handle)
 ## --------------------------

@@ -112,7 +112,7 @@ def store_tweets(path, new_tweets):
 def clean_tweets(tweets):
     # Removes all unnecessay white space, eg. '   Hi    ' -> 'Hi'
     tweets = [tweet.rstrip() for tweet in tweets]
-    # Removes all twitter handles, eg. 'Check out @evilhag' -> 'Check out'
+    # Removes all twitter handles, eg. 'Check out @someone' -> 'Check out'
     tweets = [re.sub(r'@\S+', '', tweet) for tweet in tweets]
     # Removes all links, eg. 'Visit https://google.com' -> 'Visit'
     tweets = [re.sub(r'https\S+', '', tweet) for tweet in tweets]
@@ -195,7 +195,7 @@ def calculate_millennialness(classifier, accuracy, user):
         print('millennial tweets: ' + str(len(millennial_tweets)))
         print('millennial tweet proportion: ' + str(round(millennial_tweets_proportion, 3))+'\n')
     else:
-        print('definently not a millennial.')
+        print('definetly not a millennial.')
 ## --------------------------
 
 

@@ -49,10 +49,12 @@ minimum_millennial_proportion = 0.01
 # A list of emojis that convey positive emotion
 positive_emojis = ['😂','❤','😍','😊','💕','😘','☺','👌','😏','😁','😉','👍','🎉','🙌','🙏','love','yummy','delicious']
 # A list of emojis that convey negative emotion
-negative_emojis = ['😭','😒','😩','😔','☹','💩','😡','😭','😢','😕','😞','🤮','👎','😣','💔','disgusting','gross','aweful']
+negative_emojis = ['😭','😒','😩','😔','☹','💩','😡','😭','😢','😕','😞','🤮','👎','😣','💔','disgusting','gross','awful']
 # A list of all the emojis we care about
 all_emojis = positive_emojis + negative_emojis
 ## --------------------------
+
+
 
 
 ## ----- TWITTER STREAM -----
@@ -198,6 +200,8 @@ def calculate_millennialness(classifier, accuracy, user):
         print('definetly not a millennial.')
 ## --------------------------
 
+#data = tweets()
+#print(data())
 
 ## ---- EXECUTE PROGRAM -----
 # Gets the path of this .py file
